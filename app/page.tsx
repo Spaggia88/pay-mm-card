@@ -1,79 +1,101 @@
 "use client";
 
 import { DaimoPayButton } from "@daimo/pay";
-import { useState } from "react";
+import { CreditCardIcon } from "@primer/octicons-react";
+import { formatUnits } from "viem";
+import { linea } from "viem/chains";
+import { useAccount, useBalance, useConnect } from "wagmi";
+import { DPProvider } from "./DaimoPayProvider";
 
-type Item = { name: string; description: string; price: number };
-
-const items: Item[] = [
-  { name: "Apples", description: "1lb bag", price: 0.2 },
-  { name: "Oranges", description: "1.5lb bag", price: 0.25 },
-  { name: "Banana", description: "One bunch, organic", price: 0.3 },
-];
-
+const LINEA_USDC_ADDRESS = "0x176211869cA2b568f2A7D4EE941E073a821EE1ff";
 export default function Home() {
-  // Daimo Pay can be used in the same way for deposit (to dapp), donate, and invoice flows.
-  // In this example, we demo an e-commerce checkout flow.
-  // Start by letting the user choose what to buy:
-  const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const totalUsd = selectedItems.reduce((a, b) => a + b.price, 0); // Dollars
+  const account = useAccount();
+  const { data: balance } = useBalance({
+    address: account.address,
+    token: LINEA_USDC_ADDRESS,
+    chainId: linea.id,
+  });
+
+  const { connectors, connect } = useConnect();
+  console.log(
+    `Rendering. Account: ${account.address}. Connectors: ${connectors.map(
+      (c) => c.name
+    )}`
+  );
+  const connector = connectors[0];
 
   return (
-    <main>
-      <h1>Daimo Pay Hello World</h1>
+    <main
+      style={{
+        margin: "32px auto",
+        maxWidth: "512px",
+        borderRadius: 16,
+        padding: 32,
+        backgroundColor: "#fdfdfd",
+        height: "360px"
+      }}
+    >
+        <CreditCardIcon size={48} />
+      <h1 style={{fontSize: 24, fontWeight: 600}}>Deposit to MetaMask Card</h1>
       <div style={{ height: "16px" }} />
-      <h2>Select Items</h2>
-      <div style={{ height: "8px" }} />
-      <ItemsPicker {...{ selectedItems, setSelectedItems }} />
-      <strong>Total: ${totalUsd.toFixed(2)}</strong>
-      <div style={{ height: "8px" }} />
-      <DaimoPayButton
-        appId="pay-demo"
-        toChain={8453}
-        toAddress="0xc60A0A0E8bBc32DAC2E03030989AD6BEe45A874D"
-        toToken="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
-        toUnits={totalUsd.toFixed(2)}
-        onPaymentCompleted={() => {
-          window.alert("Payment completed");
-        }}
-      />
+      {account.address == null ? (
+        <>
+          <h2>Connect MetaMask</h2>
+          <MMBtn onClick={() => connect({ connector })}>Connect</MMBtn>
+        </>
+      ) : (
+        <>
+          {balance && (
+            <>
+              <div style={{ height: "16px" }} />
+              <h2>
+                $
+                {Number(formatUnits(balance.value, balance.decimals)).toFixed(
+                  2
+                )}
+              </h2>
+              <div style={{fontSize: 14, fontWeight: 600, color: '#666'}}>USDC ON LINEA</div>
+            </>
+          )}
+          <div style={{ height: "16px" }} />
+          <DPProvider>
+            <DaimoPayButton.Custom
+              appId="pay-demo"
+              toChain={linea.id}
+              toToken={LINEA_USDC_ADDRESS}
+              toAddress={account.address}
+              intent="Deposit to Metamask Card"
+            >
+              {({ show }) => (
+                <MMBtn onClick={show}>Deposit</MMBtn>
+              )}
+            </DaimoPayButton.Custom>
+          </DPProvider>
+          <div style={{ height: "16px" }} />
+          <p style={{textAlign: 'center', color: '#666'}}>
+            Deposit from an exchange or wallet.<br/>
+            Supports any coin on any chain.
+          </p>
+        </>
+      )}
     </main>
   );
 }
-function ItemsPicker({
-  selectedItems,
-  setSelectedItems,
-}: {
-  selectedItems: Item[];
-  setSelectedItems: (items: Item[]) => void;
-}) {
-  return (
-    <div>
-      {items.map((item: Item) => (
-        <div key={item.name}>
-          <input
-            type="checkbox"
-            id={item.name}
-            checked={selectedItems.some(
-              (selectedItem) => selectedItem.name === item.name
-            )}
-            onChange={(e) => {
-              if (e.target.checked) {
-                setSelectedItems([...selectedItems, item]);
-              } else {
-                setSelectedItems(
-                  selectedItems.filter(
-                    (selectedItem) => selectedItem.name !== item.name
-                  )
-                );
-              }
-            }}
-          />
-          <label htmlFor={item.name}>
-            {item.name} - {item.description} - ${item.price.toFixed(2)}
-          </label>
-        </div>
-      ))}
-    </div>
-  );
-}
+
+const MMBtn = ({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) => (
+  <button
+    onClick={onClick}
+    style={{
+      backgroundColor: 'rgb(3, 118, 201)',
+      color: 'white',
+      padding: '16px 32px',
+      borderRadius: '48px',
+      border: 'none',
+      fontSize: '16px',
+      fontWeight: 500,
+      cursor: 'pointer'
+    }}
+  >
+    {children}
+  </button>
+);

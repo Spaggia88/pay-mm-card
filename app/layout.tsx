@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { EthProvider } from "./EthProvider";
+import { MetaMaskProvider } from "./MetaMaskProvider";
 
 export const metadata: Metadata = {
   title: "Daimo Pay Hello World",
@@ -14,10 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <EthProvider>
+      <body style={{backgroundColor: '#eee'}}>
+        <MetaMaskProvider>
           {children}
-        </EthProvider>
+        </MetaMaskProvider>
       </body>
     </html>
   );
