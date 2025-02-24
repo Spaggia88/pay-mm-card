@@ -3,7 +3,11 @@
 :root {
   --background: #fff;
   --foreground: #333;
+  --gray-600: #666;
+  --gray-400: #444;
+  --primary: rgb(3, 118, 201);
 }
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -13,10 +17,54 @@ body {
 }
 
 main {
-  padding: 32px 16px;
+  margin: 32px auto;
+  max-width: 512px;
+  border-radius: 16px;
+  padding: 32px;
+  background-color: #fdfdfd;
+  height: 360px;
 }
 
+.button-primary {
+  background-color: var(--primary);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 48px;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
 
+.button-text {
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  color: var(--gray-600);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.button-text:hover {
+  color: var(--gray-400);
+}
+
+.text-gray {
+  color: var(--gray-600);
+  font-size: 14px;
+}
+
+.text-gray-bold {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+
+.heading {
+  font-size: 24px;
+  font-weight: 600;
+}
 
 * {
   box-sizing: border-box;
