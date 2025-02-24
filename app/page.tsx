@@ -10,7 +10,7 @@ import { DPProvider } from "./DaimoPayProvider";
 const LINEA_USDC_ADDRESS = "0x176211869cA2b568f2A7D4EE941E073a821EE1ff";
 export default function Home() {
   const account = useAccount();
-  const { data: balance } = useBalance({
+  const { data: balance, refetch } = useBalance({
     address: account.address,
     token: LINEA_USDC_ADDRESS,
     chainId: linea.id,
@@ -24,6 +24,17 @@ export default function Home() {
   );
   const connector = connectors[0];
 
+  // Reload balance on successful deposit.
+  const refreshBalance = async () => {
+    const oldBalance = balance?.value;
+    while (balance?.value === oldBalance) {
+      console.log(`Old balance ${oldBalance}, refetching`);
+      await refetch();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    console.log(`New balance ${balance?.value}`);
+  };
+
   return (
     <main
       style={{
@@ -32,16 +43,18 @@ export default function Home() {
         borderRadius: 16,
         padding: 32,
         backgroundColor: "#fdfdfd",
-        height: "360px"
+        height: "360px",
       }}
     >
-        <CreditCardIcon size={48} />
-      <h1 style={{fontSize: 24, fontWeight: 600}}>Deposit to MetaMask Card</h1>
+      <CreditCardIcon size={48} />
+      <div style={{ height: "8px" }} />
+      <h1 style={{ fontSize: 24, fontWeight: 600 }}>
+        Deposit to MetaMask Card
+      </h1>
       <div style={{ height: "16px" }} />
       {account.address == null ? (
         <>
-          <h2>Connect MetaMask</h2>
-          <MMBtn onClick={() => connect({ connector })}>Connect</MMBtn>
+          <MMBtn onClick={() => connect({ connector })}>Connect MetaMask</MMBtn>
         </>
       ) : (
         <>
@@ -54,7 +67,9 @@ export default function Home() {
                   2
                 )}
               </h2>
-              <div style={{fontSize: 14, fontWeight: 600, color: '#666'}}>USDC ON LINEA</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#666" }}>
+                USDC ON LINEA
+              </div>
             </>
           )}
           <div style={{ height: "16px" }} />
@@ -65,15 +80,16 @@ export default function Home() {
               toToken={LINEA_USDC_ADDRESS}
               toAddress={account.address}
               intent="Deposit to Metamask Card"
+              onPaymentCompleted={refreshBalance}
+              closeOnSuccess
             >
-              {({ show }) => (
-                <MMBtn onClick={show}>Deposit</MMBtn>
-              )}
+              {({ show }) => <MMBtn onClick={show}>Deposit</MMBtn>}
             </DaimoPayButton.Custom>
           </DPProvider>
           <div style={{ height: "16px" }} />
-          <p style={{textAlign: 'center', color: '#666'}}>
-            Deposit from an exchange or wallet.<br/>
+          <p style={{ textAlign: "center", color: "#666" }}>
+            Deposit from an exchange or wallet.
+            <br />
             Supports any coin on any chain.
           </p>
         </>
@@ -82,18 +98,24 @@ export default function Home() {
   );
 }
 
-const MMBtn = ({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) => (
+const MMBtn = ({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+}) => (
   <button
     onClick={onClick}
     style={{
-      backgroundColor: 'rgb(3, 118, 201)',
-      color: 'white',
-      padding: '16px 32px',
-      borderRadius: '48px',
-      border: 'none',
-      fontSize: '16px',
+      backgroundColor: "rgb(3, 118, 201)",
+      color: "white",
+      padding: "16px 32px",
+      borderRadius: "48px",
+      border: "none",
+      fontSize: "16px",
       fontWeight: 500,
-      cursor: 'pointer'
+      cursor: "pointer",
     }}
   >
     {children}
