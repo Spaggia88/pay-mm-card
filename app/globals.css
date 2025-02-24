@@ -1,11 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
+/* Minimalist button reset */
+button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
 :root {
   --background: #fff;
   --foreground: #333;
   --gray-600: #666;
   --gray-400: #444;
   --primary: rgb(3, 118, 201);
+  --primary-dark: rgb(2, 98, 167);
+  --border-color: #eee;
+  --highlight: #fff9c4;
 }
 
 body {
@@ -22,7 +37,7 @@ main {
   border-radius: 16px;
   padding: 32px;
   background-color: #fdfdfd;
-  height: 360px;
+  min-height: 360px;
 }
 
 .button-primary {
@@ -34,6 +49,11 @@ main {
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.05s ease;
+}
+
+.button-primary:hover {
+  background-color: var(--primary-dark);
 }
 
 .button-text {
@@ -64,6 +84,61 @@ main {
 .heading {
   font-size: 24px;
   font-weight: 600;
+}
+
+.deposit-row-wrap {
+  margin: 0 -32px;
+  padding: 0 32px;
+}
+
+.deposit-row {
+  padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  animation: fade-highlight 2s ease-out;
+}
+
+@keyframes fade-highlight {
+  0% {
+    background-color: var(--highlight);
+  }
+  50% {
+    background-color: var(--highlight);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.deposit-row-wrap:last-child .deposit-row {
+  border-bottom: none;
+  padding-bottom: 4px;
+}
+
+.deposit-amount {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.deposit-details {
+  text-align: right;
+}
+
+.deposit-time {
+  margin-bottom: 4px;
+}
+
+.deposit-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.deposit-link:hover {
+  color: var(--gray-400);
 }
 
 * {
