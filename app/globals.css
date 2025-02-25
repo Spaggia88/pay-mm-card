@@ -89,6 +89,7 @@ main {
 .deposit-row-wrap {
   margin: 0 -32px;
   padding: 0 32px;
+  animation: fade-highlight 4s ease-out;
 }
 
 .deposit-row {
@@ -97,14 +98,13 @@ main {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
-  animation: fade-highlight 2s ease-out;
 }
 
 @keyframes fade-highlight {
   0% {
     background-color: var(--highlight);
   }
-  50% {
+  80% {
     background-color: var(--highlight);
   }
   100% {

@@ -46,7 +46,12 @@ export default function Home() {
   }, [isFetching]);
 
   // Reload balance on successful deposit.
+  const [externalId, setExternalId] = useState(()=>crypto.randomUUID());
   const refreshBalance = async () => {
+    // TODO: without the timeout, we get a flash of spinner after the checkmark.
+    // This is because we're now on the confirm page with a new externalId > new payId.
+    setTimeout(() => setExternalId(crypto.randomUUID()), 2000);
+
     const oldBalance = balance?.value;
     while (balance?.value === oldBalance) {
       console.log(`Old balance ${oldBalance}, refetching`);
@@ -70,6 +75,7 @@ export default function Home() {
           balance={balance}
           disconnect={disconnect}
           refreshBalance={refreshBalance}
+          externalId={externalId}
         />
       )}
     </main>
@@ -95,11 +101,13 @@ function ConnectedView({
   balance,
   disconnect,
   refreshBalance,
+  externalId,
 }: {
   address: Address;
   balance: Balance | undefined;
   disconnect: () => void;
   refreshBalance: () => Promise<void>;
+  externalId: string;
 }) {
   const [recentDeposits, setRecentDeposits] = useState<DaimoPayment[]>([]);
 
@@ -124,6 +132,7 @@ function ConnectedView({
           address={address}
           refreshBalance={refreshBalance}
           onDeposit={(event) => setRecentDeposits([event, ...recentDeposits])}
+          externalId={externalId}
         />
       </div>
       <div style={{ height: "32px" }} />
@@ -203,15 +212,18 @@ function DepositButton({
   address,
   refreshBalance,
   onDeposit,
+  externalId,
 }: {
   address: Address;
   refreshBalance: () => Promise<void>;
   onDeposit: (payment: DaimoPayment) => void;
+  externalId: string;
 }) {
   return (
     <DPProvider>
       <DaimoPayButton.Custom
         appId="pay-demo"
+        externalId={externalId}
         toChain={linea.id}
         toToken={LINEA_USDC_ADDRESS}
         toAddress={address}
