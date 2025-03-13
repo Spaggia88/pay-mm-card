@@ -46,7 +46,7 @@ export default function Home() {
   }, [isFetching]);
 
   // Reload balance on successful deposit.
-  const [externalId, setExternalId] = useState(()=>crypto.randomUUID());
+  const [externalId, setExternalId] = useState(() => crypto.randomUUID());
   const refreshBalance = async () => {
     // TODO: without the timeout, we get a flash of spinner after the checkmark.
     // This is because we're now on the confirm page with a new externalId > new payId.
@@ -156,11 +156,7 @@ function ConnectedView({
   );
 }
 
-function DepositRow({
-  deposit,
-}: {
-  deposit: DaimoPayment;
-}) {
+function DepositRow({ deposit }: { deposit: DaimoPayment }) {
   const dest = assertNotNull(deposit.destination);
   assert(dest.tokenSymbol === "USDC");
   const amountUSDC = dest.amountUnits;
@@ -169,9 +165,7 @@ function DepositRow({
     <div className="deposit-row-wrap">
       <div className="deposit-row">
         <div>
-          <div className="deposit-amount">
-            ${Number(amountUSDC).toFixed(2)}
-          </div>
+          <div className="deposit-amount">${Number(amountUSDC).toFixed(2)}</div>
         </div>
         <div className="deposit-details">
           <div className="text-gray deposit-time">
@@ -232,6 +226,7 @@ function DepositButton({
           refreshBalance();
           onDeposit(event.payment);
         }}
+        paymentOptions={["Coinbase", "Solana", "ExternalChains"]}
         closeOnSuccess
       >
         {({ show }) => <MMBtn onClick={show}>Deposit</MMBtn>}
